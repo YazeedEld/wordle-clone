@@ -1,26 +1,32 @@
 'use strict'
 console.clear();
-
-let grid = document.getElementById('grid');
-constructGrid();
+const numberOfLetters = 5;
+const numberOfAttempts = 6;
 
 let wordList = [
-    // 'cancer',
-    // 'games',
-    // 'toxic',
-    // 'mount',
+    'cancer',
+    'games',
+    'toxic',
+    'mount',
     'horse'
 ]
 let randomIndex = Math.floor(Math.random()*wordList.length);
 let secret = wordList[randomIndex];
 
+let history = ['mount','prime'];
+let currentAttempt = 'ladi';
+
+let grid = document.getElementById('grid');
+
+constructGrid();
+updateGrid();
 
 
 function constructGrid() {
-    for (let i=0; i<6; i++) {
+    for (let i=0; i<numberOfAttempts; i++) {
         let row = document.createElement('div');
         row.className = 'row';
-        for (let j=0; j<5; j++) {
+        for (let j=0; j<numberOfLetters; j++) {
             let cell = document.createElement('div');
             cell.className = 'cell';
             cell.textContent = ''
@@ -30,32 +36,36 @@ function constructGrid() {
     }
 }
 
-let attempts = ['rohan'];
-let currentAttempt = '';
-
-updateGrid();
-
 function updateGrid() {
     let row = grid.firstChild;
-    for (let attempt of attempts) {
-        revealPastAttempt(row,attempt)
+    for (let attempt of history) {
+        revealRow(row,attempt)
         row = row.nextSibling;
     }
-    revealCurrentAttempt(row,currentAttempt);
+    insertLetters(row,currentAttempt);
     row = row.nextSibling;
 }
 
-function revealPastAttempt(row,attempt){
-    for (let i=0; i<5; i++){
+function revealRow(row,attempt){
+    for (let i=0; i<numberOfLetters; i++){
         let cell = row.children[i];
-        cell.textContent = attempt[i];
+        if(attempt[i] !== undefined){
+            cell.textContent = attempt[i];
+        } else {
+            cell.innerHTML = '<div style="opacity:0">X</div>'
+        }
         cell.style.backgroundColor = getBgColor(attempt,i);
     }
 }
-function revealCurrentAttempt(row,attempt){
-    for (let i=0; i<5; i++){
+
+function insertLetters(row,attempt){
+    for (let i=0; i<numberOfLetters; i++){
         let cell = row.children[i];
-        cell.textContent = attempt[i] ?? '';
+        if(attempt[i] !== undefined){
+            cell.textContent = attempt[i];
+        } else {
+            cell.innerHTML = '<div style="opacity:0">X</div>'
+        }
     }
 }
 
@@ -63,19 +73,13 @@ function getBgColor(attempt,i) {
     let correctLetter = secret[i];
     let attemptLetter = attempt[i];
     console.log(i,attemptLetter,correctLetter)
-    if (!secret.includes(attemptLetter)){
-        return 'darkgrey';
+    if(attemptLetter === undefined){
+        return
+    } else if  (!secret.includes(attemptLetter)){
+        return '#3a3a3c';
     } else if (correctLetter === attemptLetter) {
-        return 'green';
+        return '#538d4e';
     } else {
-        return 'yellow'
+        return '#b59f3b'
     }
-}
-
-console.log();
-document.addEventListener('click',test)
-
-function test(){
-    grid.style.backgroundColor = 'red';
-    console.log(grid.style.backgroundColor)
 }
